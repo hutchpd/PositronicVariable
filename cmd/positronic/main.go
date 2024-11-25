@@ -1,19 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hutchpd/positronic-variables/pkg/positronic"
 )
 
 func Program(antival *positronic.PositronicVariable, entropy int) {
-	// Print the initial state of the positronic variable
-	fmt.Printf("The antival is %v\n", antival)
+	// Use the Output method instead of fmt.Printf
+	antival.Output("The antival is %v\n", antival)
 
 	// Perform arithmetic operations with the positronic variable
 	val := (antival.CurrentState().(int) + 1) % 3
 
-	// Print the computed value
-	fmt.Printf("The value is %v\n", val)
+	// Output the computed value
+	antival.Output("The value is %v\n", val)
 
 	// Update the positronic variable with the new value, passing entropy
 	antival.Assign(val, entropy)
