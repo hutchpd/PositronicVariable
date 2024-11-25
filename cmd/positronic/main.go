@@ -25,10 +25,8 @@ func main() {
 
 	// Run the program with the positronic variable
 	antival.RunProgram(Program)
-
-	// After convergence, print the final state
-	fmt.Printf("The final antival is %v\n", antival)
 }
 
 // Output:
 // The final antival is any(0, 1, 2)
+// The value is any(The value is 0, The value is 1, The value is 2)

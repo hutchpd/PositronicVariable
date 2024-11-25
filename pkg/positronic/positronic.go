@@ -32,18 +32,11 @@ func (pv *PositronicVariable) Reinitialize(value interface{}) {
 
 // Assign assigns a new value to the positronic variable
 func (pv *PositronicVariable) Assign(value interface{}, entropy int) {
-	pv.mu.Lock()
-	defer pv.mu.Unlock()
+    pv.mu.Lock()
+    defer pv.mu.Unlock()
 
-	if entropy > 0 {
-		// Forward time: Append the new value to the timeline
-		pv.timeline = append(pv.timeline, []interface{}{value})
-	} else {
-		// Backward time: Remove the last value from the timeline
-		if len(pv.timeline) > 1 {
-			pv.timeline = pv.timeline[:len(pv.timeline)-1]
-		}
-	}
+    // Always append the new value to the timeline
+    pv.timeline = append(pv.timeline, []interface{}{value})
 }
 
 // CurrentState returns the current state of the positronic variable
@@ -65,62 +58,51 @@ func (pv *PositronicVariable) CurrentState() interface{} {
 
 // RunProgram runs the program function over time loops until convergence
 func (pv *PositronicVariable) RunProgram(program func(*PositronicVariable, int)) {
-	entropy := 1 // Start with forward time
-	maxIterations := 100 // Prevent infinite loops
+    entropy := 1 // Start with forward time
+    maxIterations := 100 // Prevent infinite loops
 
-	for iterations := 0; iterations < maxIterations; iterations++ {
-		if entropy > 0 {
-			// Forward time: Reinitialize and run the program
-			pv.Reinitialize(pv.timeline[0][0])
-		} else {
-			// Backward time: Do not reinitialize
-			if pv.convergence {
-				// Timelines have converged; create superpositions
-				pv.createSuperpositions()
-				break // Convergence achieved
-			}
-		}
+    // Reinitialize before starting
+    pv.Reinitialize(pv.timeline[0][0])
 
-		// Run the program, passing the current entropy
-		program(pv, entropy)
+    for iterations := 0; iterations < maxIterations; iterations++ {
+        // Run the program, passing the current entropy
+        program(pv, entropy)
 
-		// Check for convergence after backward run
-		if entropy < 0 && pv.checkConvergence() {
-			pv.convergence = true
-		}
+        // Check for convergence after backward run
+        if entropy < 0 && pv.checkConvergence() {
+            pv.convergence = true
+            pv.createSuperpositions()
+            break // Convergence achieved
+        }
 
-		// Reverse the arrow of time
-		entropy = -entropy
-	}
+        // Reverse the arrow of time
+        entropy = -entropy
+    }
 }
 
 // checkConvergence checks if the timelines have converged
 func (pv *PositronicVariable) checkConvergence() bool {
-	pv.mu.Lock()
-	defer pv.mu.Unlock()
+    pv.mu.Lock()
+    defer pv.mu.Unlock()
 
-	if len(pv.timeline) < 2 {
-		return false
-	}
+    n := len(pv.timeline)
+    maxCycleLength := 10 // Our definition of a reasonable maximum cycle length
 
-	currTL := pv.timeline[len(pv.timeline)-1]
-	prevTL := pv.timeline[len(pv.timeline)-2]
-
-	// Ensure both timelines have the same length
-	if len(currTL) != len(prevTL) {
-		return false
-	}
-
-	// Check if states are equal across the last two timelines
-	for i := range currTL {
-		if currTL[i] != prevTL[i] {
-			return false
-		}
-	}
-
-	return true
+    // Start checking from cycle length 1 up to maxCycleLength
+    for cycleLen := 1; cycleLen <= maxCycleLength && cycleLen*2 <= n; cycleLen++ {
+        match := true
+        for i := 0; i < cycleLen; i++ {
+            if pv.timeline[n-1-i][0] != pv.timeline[n-1-i-cycleLen][0] {
+                match = false
+                break
+            }
+        }
+        if match {
+            return true // Convergence detected
+        }
+    }
+    return false // No convergence detected
 }
-
 
 // createSuperpositions creates superpositions when convergence is achieved
 func (pv *PositronicVariable) createSuperpositions() {
