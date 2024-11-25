@@ -90,152 +90,6 @@ func main() {
     // After convergence, print the final state
     fmt.Printf("The final antival is %v\n", antival)
 }
-```
-
-**positronic/positronic.go**
-
-```go
-package positronic
-
-import (
-    "fmt"
-    "sync"
-
-    "github.com/hutchpd/QuantumSuperPosition-Go/pkg/quantum"
-)
-
-type PositronicVariable struct {
-    timeline    [][]interface{}
-    convergence bool
-    mu          sync.Mutex
-}
-
-func NewPositronicVariable(initialValue interface{}) *PositronicVariable {
-    return &PositronicVariable{
-        timeline: [][]interface{}{{initialValue}},
-    }
-}
-
-func (pv *PositronicVariable) Reinitialize(value interface{}) {
-    pv.mu.Lock()
-    defer pv.mu.Unlock()
-
-    pv.timeline = [][]interface{}{{value}}
-    pv.convergence = false
-}
-
-func (pv *PositronicVariable) Assign(value interface{}, entropy int) {
-    pv.mu.Lock()
-    defer pv.mu.Unlock()
-
-    if entropy > 0 {
-        // Forward time: Append the new value to the timeline
-        pv.timeline = append(pv.timeline, []interface{}{value})
-    } else {
-        // Backward time: Remove the last value from the timeline
-        if len(pv.timeline) > 1 {
-            pv.timeline = pv.timeline[:len(pv.timeline)-1]
-        }
-    }
-}
-
-func (pv *PositronicVariable) CurrentState() interface{} {
-    pv.mu.Lock()
-    defer pv.mu.Unlock()
-
-    if len(pv.timeline) == 0 {
-        return nil
-    }
-
-    currentTimeline := pv.timeline[len(pv.timeline)-1]
-    if len(currentTimeline) == 0 {
-        return nil
-    }
-
-    return currentTimeline[0]
-}
-
-func (pv *PositronicVariable) RunProgram(program func(*PositronicVariable, int)) {
-    entropy := 1 // Start with forward time
-    maxIterations := 100 // Prevent infinite loops
-
-    for iterations := 0; iterations < maxIterations; iterations++ {
-        if entropy > 0 {
-            // Forward time: Reinitialize and run the program
-            pv.Reinitialize(pv.timeline[0][0])
-        } else {
-            // Backward time: Do not reinitialize
-            if pv.convergence {
-                // Timelines have converged; create superpositions
-                pv.createSuperpositions()
-                break // Convergence achieved
-            }
-        }
-
-        // Run the program, passing the current entropy
-        program(pv, entropy)
-
-        // Check for convergence after backward run
-        if entropy < 0 && pv.checkConvergence() {
-            pv.convergence = true
-        }
-
-        // Reverse the arrow of time
-        entropy = -entropy
-    }
-}
-
-func (pv *PositronicVariable) checkConvergence() bool {
-    pv.mu.Lock()
-    defer pv.mu.Unlock()
-
-    if len(pv.timeline) < 2 {
-        return false
-    }
-
-    currTL := pv.timeline[len(pv.timeline)-1]
-    prevTL := pv.timeline[len(pv.timeline)-2]
-
-    if len(currTL) != len(prevTL) {
-        return false
-    }
-
-    for i := range currTL {
-        if currTL[i] != prevTL[i] {
-            return false
-        }
-    }
-
-    return true
-}
-
-func (pv *PositronicVariable) createSuperpositions() {
-    pv.mu.Lock()
-    defer pv.mu.Unlock()
-
-    stateSet := make(map[interface{}]struct{})
-
-    for _, tl := range pv.timeline {
-        if len(tl) > 0 {
-            stateSet[tl[0]] = struct{}{}
-        }
-    }
-
-    var states []interface{}
-    for state := range stateSet {
-        states = append(states, state)
-    }
-
-    superstate := quantum.Any(states...)
-
-    pv.timeline = append(pv.timeline, []interface{}{superstate})
-}
-
-func (pv *PositronicVariable) String() string {
-    currentState := pv.CurrentState()
-    return fmt.Sprintf("%v", currentState)
-}
-```
 
 ## Execution Instructions
 
@@ -277,12 +131,6 @@ func (pv *PositronicVariable) String() string {
 
    This will download any necessary dependencies.
 
-4. **Place the Code in the Appropriate Files**
-
-   - Copy the `main.go` code into `main.go`.
-   - Copy the `positronic` module code into `positronic/positronic.go`.
-   - Copy the `quantum` module code into `quantum/quantum.go`.
-
 5. **Build and Run the Program**
 
    Navigate to the root directory of your project and execute the program by running:
@@ -304,6 +152,9 @@ The final antival is any(-1, 0)
 ```
 
 ## Notes
+
+- **Currently there's a bug where the antival and val do not change and it iterates indefinetly**
+  TODO: Fix that
 
 - **Adjusting Convergence Criteria:**
 
