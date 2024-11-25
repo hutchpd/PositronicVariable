@@ -61,35 +61,34 @@ your_project/
 package main
 
 import (
-    "fmt"
-
-    "your_project/positronic"
+	"github.com/hutchpd/positronic-variables/pkg/positronic"
 )
 
 func Program(antival *positronic.PositronicVariable, entropy int) {
-    // Print the current state of the positronic variable
-    fmt.Printf("The antival is %v\n", antival)
+	// Use the Output method instead of fmt.Printf
+	antival.Output("The antival is %v\n", antival)
 
-    // Perform arithmetic operations with the positronic variable
-    val := (antival.CurrentState().(int) + 1) % 3
+	// Perform arithmetic operations with the positronic variable
+	val := (antival.CurrentState().(int) + 1) % 3
 
-    // Print the computed value
-    fmt.Printf("The value is %v\n", val)
+	// Output the computed value
+	antival.Output("The value is %v\n", val)
 
-    // Update the positronic variable with the new value, passing entropy
-    antival.Assign(val, entropy)
+	// Update the positronic variable with the new value, passing entropy
+	antival.Assign(val, entropy)
 }
 
 func main() {
-    // Create a new positronic variable with initial value -1
-    antival := positronic.NewPositronicVariable(-1)
+	// Create a new positronic variable
+	antival := positronic.NewPositronicVariable(-1)
 
-    // Run the program with the positronic variable
-    antival.RunProgram(Program)
-
-    // After convergence, print the final state
-    fmt.Printf("The final antival is %v\n", antival)
+	// Run the program with the positronic variable
+	antival.RunProgram(Program)
 }
+
+// Output:
+// The final antival is any(0, 1, 2)
+// The value is any(The value is 0, The value is 1, The value is 2)
 
 ## Execution Instructions
 
@@ -144,7 +143,8 @@ func main() {
 When you run `main.go`, you should see the following output:
 
 ```
-The final antival is any(1,0,2)
+The antival is any([0 1 2])
+The value is any([0 1 2])
 ```
 
 ## Notes
