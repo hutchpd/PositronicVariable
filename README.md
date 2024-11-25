@@ -149,9 +149,6 @@ The final antival is any(1,0,2)
 
 ## Notes
 
-- **Currently there's a bug where the antival and val do not change and it iterates indefinetly**
-  TODO: Fix that
-
 - **Adjusting Convergence Criteria:**
 
   You can adjust the convergence criteria in the `checkConvergence` method by changing the number of timelines compared.
@@ -163,6 +160,12 @@ The final antival is any(1,0,2)
 - **Thread Safety:**
 
   The module uses a mutex (`sync.Mutex`) to ensure thread safety, allowing for potential concurrent use.
+
+- **TODO:**
+
+1. Redefine fprintf rather than use the ugly output function
+2. avoid having to track the entropy in main.go, should be only ever tracked in positronic.go
+3. remove the need for the assignment function, should instead override the assignment operator =
 
 ## License
 
