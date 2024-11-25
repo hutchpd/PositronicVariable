@@ -144,11 +144,7 @@ func main() {
 When you run `main.go`, you should see the following output:
 
 ```
-The antival is -1
-The value is 0
-The antival is 0
-The value is 1
-The final antival is any(-1, 0)
+The final antival is any(1,0,2)
 ```
 
 ## Notes

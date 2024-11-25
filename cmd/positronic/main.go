@@ -31,6 +31,4 @@ func main() {
 }
 
 // Output:
-// The antival is -1
-// The value is 0
 // The final antival is any(0, 1, 2)
