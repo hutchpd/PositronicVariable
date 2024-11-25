@@ -63,7 +63,7 @@ func (pv *PositronicVariable) Output(format string, args ...interface{}) {
 
 
 // Assign assigns a new value to the positronic variable
-func (pv *PositronicVariable) Assign(value interface{}, entropy int) {
+func (pv *PositronicVariable) Assign(value interface{}) {
 	pv.mu.Lock()
 	defer pv.mu.Unlock()
 
@@ -89,7 +89,7 @@ func (pv *PositronicVariable) CurrentState() interface{} {
 }
 
 // RunProgram runs the program function over time loops until convergence
-func (pv *PositronicVariable) RunProgram(program func(*PositronicVariable, int)) {
+func (pv *PositronicVariable) RunProgram(program func(*PositronicVariable)) {
     entropy := 1         // Start with forward time
     maxIterations := 100 // Prevent infinite loops
     var cycleLen int     // To store the detected cycle length
@@ -105,7 +105,7 @@ func (pv *PositronicVariable) RunProgram(program func(*PositronicVariable, int))
         pv.mu.Unlock()
 
         // Run the program, passing the current entropy
-        program(pv, entropy)
+        program(pv)
 
         // Check for convergence after backward run
         if entropy < 0 {

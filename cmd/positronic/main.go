@@ -4,7 +4,7 @@ import (
 	"github.com/hutchpd/positronic-variables/pkg/positronic"
 )
 
-func Program(antival *positronic.PositronicVariable, entropy int) {
+func Program(antival *positronic.PositronicVariable) {
 	// Use the Output method instead of fmt.Printf
 	antival.Output("The antival is %v\n", antival)
 
@@ -15,7 +15,7 @@ func Program(antival *positronic.PositronicVariable, entropy int) {
 	antival.Output("The value is %v\n", val)
 
 	// Update the positronic variable with the new value, passing entropy
-	antival.Assign(val, entropy)
+	antival.Assign(val)
 }
 
 func main() {

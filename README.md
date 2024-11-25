@@ -88,7 +88,7 @@ func main() {
 
 // Output:
 // The final antival is any(0, 1, 2)
-// The value is any(The value is 0, The value is 1, The value is 2)
+// The value is any(0, 1, 2)
 ```
 
 ## Execution Instructions
